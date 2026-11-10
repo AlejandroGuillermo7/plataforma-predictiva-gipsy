@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Gipsy{% endblock %} · Plataforma predictiva</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+</head>
+<body>
+<div class="layout">
+  <nav class="menu">
+    <div class="marca">Gipsy</div>
+    <div class="sub">Análisis predictivo de compras</div>
+    {% set rol = current_user.rol.nombre %}
+    {% set ep = request.endpoint %}
+    <a href="{{ url_for('views.panel') }}" class="{{ 'activo' if ep == 'views.panel' }}">Panel</a>
+    {% if rol == 'Gerente' %}
+      <a href="{{ url_for('views.predicciones') }}" class="{{ 'activo' if ep == 'views.predicciones' }}">Predicciones</a>
+    {% endif %}
+    <a href="{{ url_for('views.inventario') }}" class="{{ 'activo' if ep == 'views.inventario' }}">Inventario</a>
+    {% if rol in ('Vendedor', 'Gerente') %}
+      <a href="{{ url_for('views.ventas') }}" class="{{ 'activo' if ep == 'views.ventas' }}">Ventas</a>
+    {% endif %}
+    {% if rol == 'Administrador' %}
+      <a href="{{ url_for('views.importar') }}" class="{{ 'activo' if ep == 'views.importar' }}">Importar historial</a>
+      <a href="{{ url_for('views.usuarios') }}" class="{{ 'activo' if ep == 'views.usuarios' }}">Usuarios</a>
+    {% endif %}
+    <div class="usuario">{{ current_user.nombre }}<br>{{ rol }} · <a href="{{ url_for('auth.logout') }}">Salir</a></div>
+  </nav>
+  <main>
+    {% for categoria, texto in get_flashed_messages(with_categories=true) %}
+      <div class="mensaje {{ categoria }}">{{ texto }}</div>
+    {% endfor %}
+    {% block contenido %}{% endblock %}
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,52 @@
+:root {
+  --fondo: #f6f5f3; --panel: #ffffff; --borde: #e3e0db; --texto: #26221f;
+  --suave: #6f6862; --acento: #b04a6f; --acento-claro: #f6e7ed;
+  --ok: #2f7d4f; --ok-claro: #e5f3ea; --error: #b3261e; --error-claro: #fbe9e7;
+  --alerta: #b7791f; --alerta-claro: #fdf3e1;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif; background: var(--fondo); color: var(--texto); font-size: 15px; }
+a { color: var(--acento); }
+.layout { display: flex; min-height: 100vh; }
+.menu { width: 210px; background: var(--panel); border-right: 1px solid var(--borde); padding: 20px 14px; display: flex; flex-direction: column; }
+.menu .marca { font-size: 22px; font-weight: 700; color: var(--acento); margin: 0 6px 4px; }
+.menu .sub { font-size: 12px; color: var(--suave); margin: 0 6px 22px; }
+.menu a { display: block; padding: 9px 10px; border-radius: 8px; color: var(--texto); text-decoration: none; margin-bottom: 2px; }
+.menu a:hover { background: var(--fondo); }
+.menu a.activo { background: var(--acento-claro); color: var(--acento); font-weight: 600; }
+.menu .usuario { margin-top: auto; font-size: 13px; color: var(--suave); padding: 10px 6px 0; border-top: 1px solid var(--borde); }
+.menu .usuario a { display: inline; padding: 0; color: var(--acento); }
+main { flex: 1; padding: 28px 32px; max-width: 1150px; }
+h1 { font-size: 24px; margin: 0 0 4px; }
+.descripcion { color: var(--suave); margin: 0 0 22px; }
+.tarjetas { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.tarjeta { background: var(--panel); border: 1px solid var(--borde); border-radius: 12px; padding: 16px 18px; }
+.tarjeta .etiqueta { color: var(--suave); font-size: 13px; }
+.tarjeta .valor { font-size: 26px; font-weight: 700; margin-top: 6px; }
+.tarjeta .valor.alerta { color: var(--alerta); }
+.caja { background: var(--panel); border: 1px solid var(--borde); border-radius: 12px; padding: 18px 20px; margin-bottom: 22px; }
+.caja h2 { font-size: 17px; margin: 0 0 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { text-align: left; color: var(--suave); font-weight: 600; border-bottom: 1px solid var(--borde); padding: 8px 6px; }
+td { border-bottom: 1px solid var(--borde); padding: 8px 6px; }
+tr.riesgo td { background: var(--alerta-claro); }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+form.filtros, form.fila { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+label { display: flex; flex-direction: column; font-size: 13px; color: var(--suave); gap: 4px; }
+input, select { font: inherit; padding: 8px 10px; border: 1px solid var(--borde); border-radius: 8px; background: #fff; color: var(--texto); }
+button, .boton { font: inherit; padding: 9px 16px; border-radius: 8px; border: 1px solid var(--acento); background: var(--acento); color: #fff; cursor: pointer; font-weight: 600; text-decoration: none; display: inline-block; }
+button.secundario { background: #fff; color: var(--acento); }
+button.pequeno { padding: 4px 10px; font-size: 13px; }
+.mensaje { padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; }
+.mensaje.ok { background: var(--ok-claro); color: var(--ok); }
+.mensaje.error { background: var(--error-claro); color: var(--error); }
+.insignia { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 12px; font-weight: 600; }
+.insignia.alerta { background: var(--alerta-claro); color: var(--alerta); }
+.insignia.ok { background: var(--ok-claro); color: var(--ok); }
+.insignia.gris { background: var(--fondo); color: var(--suave); }
+.aviso { background: var(--acento-claro); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; }
+.login { max-width: 360px; margin: 12vh auto; background: var(--panel); border: 1px solid var(--borde); border-radius: 14px; padding: 30px; }
+.login h1 { color: var(--acento); text-align: center; }
+.login p { text-align: center; color: var(--suave); margin-top: 0; }
+.login form { display: flex; flex-direction: column; gap: 14px; }
+.vacio { color: var(--suave); padding: 10px 0; }

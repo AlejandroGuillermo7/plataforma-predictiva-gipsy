@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block titulo %}Panel{% endblock %}
+{% block contenido %}
+<h1>Resumen de hoy</h1>
+<p class="descripcion">{{ current_user.nombre }}, esto es lo más importante de la tienda en este momento.</p>
+
+<div class="tarjetas">
+  <div class="tarjeta"><div class="etiqueta">Ventas del día</div><div class="valor">{{ ventas_hoy | dinero }}</div></div>
+  <div class="tarjeta"><div class="etiqueta">Variantes por agotarse</div><div class="valor alerta">{{ alertas | length }}</div></div>
+  <div class="tarjeta"><div class="etiqueta">Baja rotación (60 días)</div><div class="valor">{{ rezagadas | length }}</div></div>
+</div>
+
+<div class="caja">
+  <h2>Alertas de desabasto{% if periodo %} · {{ periodo.strftime('%m/%Y') }}{% endif %}</h2>
+  {% if alertas %}
+  <table>
+    <tr><th>Prenda</th><th class="num">Stock</th><th class="num">Venta estimada</th><th class="num">Sugerido comprar</th></tr>
+    {% for f in alertas[:8] %}
+    <tr class="riesgo"><td>{{ f.variante.etiqueta }}</td><td class="num">{{ f.stock }}</td><td class="num">{{ f.estimado }}</td><td class="num"><strong>{{ f.sugerido }}</strong></td></tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <div class="vacio">Sin alertas. {% if not periodo %}Aún no se han generado predicciones.{% endif %}</div>
+  {% endif %}
+</div>
+{% endblock %}

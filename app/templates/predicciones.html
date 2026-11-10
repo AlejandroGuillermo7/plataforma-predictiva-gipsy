@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block titulo %}Predicciones{% endblock %}
+{% block contenido %}
+<h1>Predicciones de compra{% if periodo %} · {{ periodo.strftime('%m/%Y') }}{% endif %}</h1>
+<p class="descripcion">Venta estimada por prenda para el próximo mes y cuánto conviene comprar. La decisión final es del gerente.</p>
+
+<div class="caja" style="display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;">
+  <div>
+    {% if filas %}
+      Modelo elegido: <strong>{{ filas[0].pred.algoritmo }}</strong> ·
+      Error promedio (MAE): <strong>{{ filas[0].pred.mae }} piezas</strong> ·
+      Generado el {{ filas[0].pred.fecha_generacion.strftime('%d/%m/%Y %H:%M') if filas[0].pred.fecha_generacion.strftime is defined else filas[0].pred.fecha_generacion }}
+    {% else %}
+      Aún no hay predicciones. Presiona el botón para entrenar el modelo con el historial.
+    {% endif %}
+  </div>
+  <form method="post" action="{{ url_for('views.actualizar_predicciones') }}"><button type="submit">Actualizar predicciones</button></form>
+</div>
+
+{% if filas %}
+<div class="caja">
+  <h2>Recomendaciones ({{ filas | selectattr('alerta') | list | length }} con riesgo de desabasto)</h2>
+  <table>
+    <tr><th>Prenda</th><th>Categoría</th><th class="num">Stock</th><th class="num">Venta estimada</th><th class="num">Sugerido comprar</th><th>Alerta</th></tr>
+    {% for f in filas %}
+    <tr class="{{ 'riesgo' if f.alerta }}">
+      <td>{{ f.variante.etiqueta }}</td><td>{{ f.variante.producto.categoria.nombre }}</td>
+      <td class="num">{{ f.stock }}</td><td class="num">{{ f.estimado }}</td>
+      <td class="num">{% if f.sugerido %}<strong>{{ f.sugerido }}</strong>{% else %}0{% endif %}</td>
+      <td>{% if f.alerta %}<span class="insignia alerta">Desabasto</span>{% else %}<span class="insignia ok">Suficiente</span>{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+
+<div class="caja">
+  <h2>Baja rotación: sin ventas en {{ dias }} días</h2>
+  {% if rezagadas %}
+  <table>
+    <tr><th>Prenda</th><th class="num">Stock</th><th>Última venta</th></tr>
+    {% for r in rezagadas %}
+    <tr><td>{{ r.variante.etiqueta }}</td><td class="num">{{ r.variante.stock }}</td><td>{{ r.ultima.strftime('%d/%m/%Y') if r.ultima else 'Nunca' }}</td></tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <div class="vacio">Todas las prendas con existencias se han vendido recientemente.</div>
+  {% endif %}
+</div>
+{% endblock %}

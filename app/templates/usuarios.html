@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block titulo %}Usuarios{% endblock %}
+{% block contenido %}
+<h1>Usuarios</h1>
+<p class="descripcion">Alta de usuarios y asignación de rol. Las contraseñas se guardan cifradas.</p>
+
+<div class="caja">
+  <table>
+    <tr><th>Nombre</th><th>Usuario</th><th>Rol</th><th>Estado</th><th></th></tr>
+    {% for u in usuarios %}
+    <tr>
+      <td>{{ u.nombre }}</td><td>{{ u.usuario }}</td><td>{{ u.rol.nombre }}</td>
+      <td><span class="insignia {{ 'ok' if u.activo else 'gris' }}">{{ 'Activo' if u.activo else 'Inactivo' }}</span></td>
+      <td>{% if u.id_usuario != current_user.id_usuario %}
+        <form method="post" action="{{ url_for('views.cambiar_estado', id_usuario=u.id_usuario) }}"><button class="secundario pequeno">{{ 'Desactivar' if u.activo else 'Activar' }}</button></form>
+      {% endif %}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="caja">
+  <h2>Nuevo usuario</h2>
+  <form class="fila" method="post">
+    <label>Nombre completo <input name="nombre" required></label>
+    <label>Usuario <input name="usuario" required></label>
+    <label>Contraseña <input name="contrasena" type="password" minlength="6" required></label>
+    <label>Rol <select name="rol">{% for r in roles %}<option value="{{ r.id_rol }}">{{ r.nombre }}</option>{% endfor %}</select></label>
+    <button type="submit">Crear usuario</button>
+  </form>
+</div>
+{% endblock %}
