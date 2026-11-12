@@ -189,7 +189,7 @@ INSERT INTO color (id_color, nombre) VALUES
 (7, 'Beige'),
 (8, 'Gris');
 
--- variante: 56 registros
+-- variante: 56 registrosss
 INSERT INTO variante (id_variante, id_producto, id_talla, id_color, precio_venta, costo, stock) VALUES
 (1, 1, 1, 1, 250, 125, 7),
 (2, 1, 2, 1, 250, 125, 4),
