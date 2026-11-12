@@ -1,43 +1,73 @@
 {% extends "base.html" %}
 {% block titulo %}Ventas{% endblock %}
 {% block contenido %}
-<h1>Registrar venta</h1>
-<p class="descripcion">Elige las prendas y la cantidad. El inventario se descuenta al confirmar.</p>
+<div class="page-top">
+  <div>
+    <h1 class="page-title">Registrar venta</h1>
+    <p class="page-subtitle">Elige las prendas y la cantidad. El inventario se descuenta al confirmar.</p>
+  </div>
+</div>
 
-<div class="caja">
-  <form method="post" action="{{ url_for('views.nueva_venta') }}">
+<div class="panel-card">
+  <form method="post" action="{{ url_for('views.nueva_venta') }}" class="form-card">
     {% for i in range(4) %}
-    <div class="fila" style="display:flex; gap:10px; margin-bottom:10px;">
-      <label style="flex:1">Prenda {{ i + 1 }}
+    <div class="form-grid">
+      <label class="field" style="grid-column: 1 / span 2;">
+        Prenda {{ i + 1 }}
         <select name="variante">
           <option value="">—</option>
           {% for v in variantes %}<option value="{{ v.id_variante }}">{{ v.etiqueta }} · {{ v.precio_venta | dinero }} · quedan {{ v.stock }}</option>{% endfor %}
         </select>
       </label>
-      <label>Cantidad <input name="cantidad" type="number" min="0" value="{{ 1 if i == 0 else 0 }}" style="width:90px"></label>
+      <label class="field">
+        Cantidad
+        <input name="cantidad" type="number" min="0" value="{{ 1 if i == 0 else 0 }}">
+      </label>
     </div>
     {% endfor %}
-    <button type="submit">Confirmar venta</button>
+    <div class="toolbar">
+      <div class="kpi-meta">Se registrarán las prendas con cantidad mayor a 0.</div>
+      <button type="submit">Confirmar venta</button>
+    </div>
   </form>
 </div>
 
-<div class="caja">
-  <h2>Últimas ventas</h2>
-  <table>
-    <tr><th>Folio</th><th>Fecha</th><th>Vendedor</th><th>Prendas</th><th class="num">Total</th><th>Estado</th>{% if current_user.rol.nombre == 'Gerente' %}<th></th>{% endif %}</tr>
-    {% for v in recientes %}
-    <tr>
-      <td>{{ v.id_venta }}</td><td>{{ v.fecha.strftime('%d/%m/%Y %H:%M') }}</td><td>{{ v.usuario.nombre }}</td>
-      <td>{% for d in v.detalles %}{{ d.variante.etiqueta }} ×{{ d.cantidad }}{% if not loop.last %}<br>{% endif %}{% endfor %}</td>
-      <td class="num">{{ v.total | dinero }}</td>
-      <td><span class="insignia {{ 'ok' if v.estado == 'Activa' else 'gris' }}">{{ v.estado }}</span></td>
-      {% if current_user.rol.nombre == 'Gerente' %}
-      <td>{% if v.estado == 'Activa' %}<form method="post" action="{{ url_for('views.cancelar_venta', id_venta=v.id_venta) }}"><button class="secundario pequeno">Cancelar</button></form>{% endif %}</td>
-      {% endif %}
-    </tr>
-    {% else %}
-    <tr><td colspan="7" class="vacio">Todavía no hay ventas registradas en el sistema.</td></tr>
-    {% endfor %}
-  </table>
+<div class="panel-card">
+  <div class="panel-head">
+    <h2>Últimas ventas</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Folio</th>
+          <th>Fecha</th>
+          <th>Vendedor</th>
+          <th>Prendas</th>
+          <th class="cell-right">Total</th>
+          <th>Estado</th>
+          {% if current_user.rol.nombre == 'Gerente' %}<th></th>{% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for v in recientes %}
+        <tr>
+          <td>{{ v.id_venta }}</td>
+          <td>{{ v.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+          <td>{{ v.usuario.nombre }}</td>
+          <td>{% for d in v.detalles %}{{ d.variante.etiqueta }} ×{{ d.cantidad }}{% if not loop.last %}<br>{% endif %}{% endfor %}</td>
+          <td class="cell-right">{{ v.total | dinero }}</td>
+          <td><span class="badge {{ 'ok' if v.estado == 'Activa' else 'gray' }}">{{ v.estado }}</span></td>
+          {% if current_user.rol.nombre == 'Gerente' %}
+          <td>{% if v.estado == 'Activa' %}<form method="post" action="{{ url_for('views.cancelar_venta', id_venta=v.id_venta) }}"><button class="secondary small">Cancelar</button></form>{% endif %}</td>
+          {% endif %}
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="empty-state">Todavía no hay ventas registradas en el sistema.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 {% endblock %}

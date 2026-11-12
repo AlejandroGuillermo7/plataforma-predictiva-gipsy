@@ -1,50 +1,105 @@
 {% extends "base.html" %}
 {% block titulo %}Predicciones{% endblock %}
 {% block contenido %}
-<h1>Predicciones de compra{% if periodo %} · {{ periodo.strftime('%m/%Y') }}{% endif %}</h1>
-<p class="descripcion">Venta estimada por prenda para el próximo mes y cuánto conviene comprar. La decisión final es del gerente.</p>
-
-<div class="caja" style="display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;">
+<div class="page-top">
   <div>
-    {% if filas %}
-      Modelo elegido: <strong>{{ filas[0].pred.algoritmo }}</strong> ·
-      Error promedio (MAE): <strong>{{ filas[0].pred.mae }} piezas</strong> ·
-      Generado el {{ filas[0].pred.fecha_generacion.strftime('%d/%m/%Y %H:%M') if filas[0].pred.fecha_generacion.strftime is defined else filas[0].pred.fecha_generacion }}
-    {% else %}
-      Aún no hay predicciones. Presiona el botón para entrenar el modelo con el historial.
-    {% endif %}
+    <h1 class="page-title">Predicciones de compra{% if periodo %} · {{ periodo.strftime('%m/%Y') }}{% endif %}</h1>
+    <p class="page-subtitle">Venta estimada por prenda para el próximo mes y cuánto conviene comprar. La decisión final es del gerente.</p>
   </div>
-  <form method="post" action="{{ url_for('views.actualizar_predicciones') }}"><button type="submit">Actualizar predicciones</button></form>
+  <div class="page-actions">
+    <form method="post" action="{{ url_for('views.actualizar_predicciones') }}">
+      <button type="submit">Actualizar predicciones</button>
+    </form>
+  </div>
+</div>
+
+<div class="panel-card">
+  <div class="panel-head">
+    <h2>Resumen del modelo</h2>
+  </div>
+  {% if filas %}
+    <div class="summary-grid">
+      <div class="summary-chip">
+        <span>Algoritmo</span>
+        <strong>{{ filas[0].pred.algoritmo }}</strong>
+      </div>
+      <div class="summary-chip">
+        <span>MAE</span>
+        <strong>{{ filas[0].pred.mae }} piezas</strong>
+      </div>
+      <div class="summary-chip">
+        <span>Generado</span>
+        <strong>{{ filas[0].pred.fecha_generacion.strftime('%d/%m/%Y %H:%M') if filas[0].pred.fecha_generacion.strftime is defined else filas[0].pred.fecha_generacion }}</strong>
+      </div>
+    </div>
+  {% else %}
+    <div class="empty-state">Aún no hay predicciones. Presiona el botón para entrenar el modelo con el historial.</div>
+  {% endif %}
 </div>
 
 {% if filas %}
-<div class="caja">
-  <h2>Recomendaciones ({{ filas | selectattr('alerta') | list | length }} con riesgo de desabasto)</h2>
-  <table>
-    <tr><th>Prenda</th><th>Categoría</th><th class="num">Stock</th><th class="num">Venta estimada</th><th class="num">Sugerido comprar</th><th>Alerta</th></tr>
-    {% for f in filas %}
-    <tr class="{{ 'riesgo' if f.alerta }}">
-      <td>{{ f.variante.etiqueta }}</td><td>{{ f.variante.producto.categoria.nombre }}</td>
-      <td class="num">{{ f.stock }}</td><td class="num">{{ f.estimado }}</td>
-      <td class="num">{% if f.sugerido %}<strong>{{ f.sugerido }}</strong>{% else %}0{% endif %}</td>
-      <td>{% if f.alerta %}<span class="insignia alerta">Desabasto</span>{% else %}<span class="insignia ok">Suficiente</span>{% endif %}</td>
-    </tr>
-    {% endfor %}
-  </table>
+<div class="panel-card">
+  <div class="panel-head">
+    <h2>Recomendaciones ({{ filas | selectattr('alerta') | list | length }} con riesgo de desabasto)</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Prenda</th>
+          <th>Categoría</th>
+          <th class="cell-right">Stock</th>
+          <th class="cell-right">Venta estimada</th>
+          <th class="cell-right">Sugerido</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in filas %}
+        <tr class="{{ 'risk' if f.alerta }}">
+          <td>{{ f.variante.etiqueta }}</td>
+          <td>{{ f.variante.producto.categoria.nombre }}</td>
+          <td class="cell-right">{{ f.stock }}</td>
+          <td class="cell-right">{{ f.estimado }}</td>
+          <td class="cell-right">{% if f.sugerido %}<strong>{{ f.sugerido }}</strong>{% else %}0{% endif %}</td>
+          <td>{% if f.alerta %}<span class="badge alert">Desabasto</span>{% else %}<span class="badge ok">Suficiente</span>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 {% endif %}
 
-<div class="caja">
-  <h2>Baja rotación: sin ventas en {{ dias }} días</h2>
+<div class="panel-card">
+  <div class="panel-head">
+    <h2>Baja rotación: sin ventas en {{ dias }} días</h2>
+  </div>
+
   {% if rezagadas %}
-  <table>
-    <tr><th>Prenda</th><th class="num">Stock</th><th>Última venta</th></tr>
-    {% for r in rezagadas %}
-    <tr><td>{{ r.variante.etiqueta }}</td><td class="num">{{ r.variante.stock }}</td><td>{{ r.ultima.strftime('%d/%m/%Y') if r.ultima else 'Nunca' }}</td></tr>
-    {% endfor %}
-  </table>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Prenda</th>
+          <th class="cell-right">Stock</th>
+          <th>Última venta</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rezagadas %}
+        <tr>
+          <td>{{ r.variante.etiqueta }}</td>
+          <td class="cell-right">{{ r.variante.stock }}</td>
+          <td>{{ r.ultima.strftime('%d/%m/%Y') if r.ultima else 'Nunca' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
   {% else %}
-  <div class="vacio">Todas las prendas con existencias se han vendido recientemente.</div>
+    <div class="empty-state">Todas las prendas con existencias se han vendido recientemente.</div>
   {% endif %}
 </div>
 {% endblock %}

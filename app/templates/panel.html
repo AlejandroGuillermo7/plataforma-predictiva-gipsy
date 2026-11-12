@@ -1,26 +1,84 @@
 {% extends "base.html" %}
 {% block titulo %}Panel{% endblock %}
 {% block contenido %}
-<h1>Resumen de hoy</h1>
-<p class="descripcion">{{ current_user.nombre }}, esto es lo más importante de la tienda en este momento.</p>
-
-<div class="tarjetas">
-  <div class="tarjeta"><div class="etiqueta">Ventas del día</div><div class="valor">{{ ventas_hoy | dinero }}</div></div>
-  <div class="tarjeta"><div class="etiqueta">Variantes por agotarse</div><div class="valor alerta">{{ alertas | length }}</div></div>
-  <div class="tarjeta"><div class="etiqueta">Baja rotación (60 días)</div><div class="valor">{{ rezagadas | length }}</div></div>
+<div class="page-top">
+  <div>
+    <h1 class="page-title">Resumen de hoy</h1>
+    <p class="page-subtitle">{{ current_user.nombre }}, esto es lo más importante de la tienda en este momento.</p>
+  </div>
 </div>
 
-<div class="caja">
-  <h2>Alertas de desabasto{% if periodo %} · {{ periodo.strftime('%m/%Y') }}{% endif %}</h2>
-  {% if alertas %}
-  <table>
-    <tr><th>Prenda</th><th class="num">Stock</th><th class="num">Venta estimada</th><th class="num">Sugerido comprar</th></tr>
-    {% for f in alertas[:8] %}
-    <tr class="riesgo"><td>{{ f.variante.etiqueta }}</td><td class="num">{{ f.stock }}</td><td class="num">{{ f.estimado }}</td><td class="num"><strong>{{ f.sugerido }}</strong></td></tr>
-    {% endfor %}
-  </table>
-  {% else %}
-  <div class="vacio">Sin alertas. {% if not periodo %}Aún no se han generado predicciones.{% endif %}</div>
-  {% endif %}
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-label">Ventas del día</div>
+    <div class="kpi-value">{{ ventas_hoy | dinero }}</div>
+    <div class="kpi-meta">Ingresos acumulados hasta ahora</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Variantes por agotarse</div>
+    <div class="kpi-value alert">{{ alertas | length }}</div>
+    <div class="kpi-meta">Requieren compra inmediata</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Baja rotación</div>
+    <div class="kpi-value">{{ rezagadas | length }}</div>
+    <div class="kpi-meta">Productos sin movimiento reciente</div>
+  </div>
+</div>
+
+<div class="home-section">
+  <div class="panel-card">
+    <div class="panel-head">
+      <h2>Alertas de desabasto{% if periodo %} · {{ periodo.strftime('%m/%Y') }}{% endif %}</h2>
+      {% if alertas %}<a class="card-link" href="{{ url_for('views.predicciones') }}">Ver detalle</a>{% endif %}
+    </div>
+
+    {% if alertas %}
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Prenda</th>
+            <th class="cell-right">Stock</th>
+            <th class="cell-right">Estimada</th>
+            <th class="cell-right">Comprar</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in alertas[:8] %}
+          <tr class="risk">
+            <td>{{ f.variante.etiqueta }}</td>
+            <td class="cell-right">{{ f.stock }}</td>
+            <td class="cell-right">{{ f.estimado }}</td>
+            <td class="cell-right"><strong>{{ f.sugerido }}</strong></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <div class="empty-state">Sin alertas. {% if not periodo %}Aún no se han generado predicciones.{% endif %}</div>
+    {% endif %}
+  </div>
+
+  <div class="panel-card">
+    <div class="panel-head">
+      <h2>Baja rotación</h2>
+      <span class="badge gray">60 días</span>
+    </div>
+    {% if rezagadas %}
+      <div class="form-card">
+        {% for r in rezagadas[:5] %}
+        <div class="summary-chip">
+          <span>{{ r.variante.etiqueta }}</span>
+          <strong>{{ r.variante.stock }} piezas</strong>
+          <div class="kpi-meta">Última venta: {{ r.ultima.strftime('%d/%m/%Y') if r.ultima else 'Nunca' }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">No se detectan prendas rezagadas.</div>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}
