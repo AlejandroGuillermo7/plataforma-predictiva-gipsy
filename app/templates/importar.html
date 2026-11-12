@@ -1,33 +1,80 @@
 {% extends "base.html" %}
 {% block titulo %}Importar historial{% endblock %}
 {% block contenido %}
-<h1>Importar historial de ventas</h1>
-<p class="descripcion">Carga un archivo de Excel (.xlsx) o CSV con las columnas: <strong>{{ columnas | join(', ') }}</strong> (y opcionalmente <strong>categoria</strong>).</p>
+<div class="page-top">
+  <div>
+    <h1 class="page-title">Importar historial</h1>
+    <p class="page-subtitle">Carga un archivo de Excel (.xlsx) o CSV con las columnas: <strong>{{ columnas | join(', ') }}</strong> (y opcionalmente <strong>categoria</strong>).</p>
+  </div>
+</div>
 
-<div class="caja">
-  <form class="fila" method="post" enctype="multipart/form-data">
-    <label>Archivo <input type="file" name="archivo" accept=".xlsx,.xls,.csv" required></label>
-    <button type="submit">Importar</button>
-  </form>
+<div class="home-section">
+  <div class="panel-card">
+    <div class="panel-head">
+      <h2>Subir archivo</h2>
+    </div>
+
+    <form class="form-card" method="post" enctype="multipart/form-data">
+      <label class="field">
+        Archivo
+        <input type="file" name="archivo" accept=".xlsx,.xls,.csv" required>
+      </label>
+      <button type="submit">Importar</button>
+    </form>
+  </div>
+
+  <div class="panel-card">
+    <div class="panel-head">
+      <h2>Últimos resultados</h2>
+    </div>
+    {% if resumen %}
+      <div class="summary-grid">
+        <div class="summary-chip"><span>Cargadas</span><strong>{{ resumen.imp.filas_cargadas }}</strong></div>
+        <div class="summary-chip"><span>Rechazadas</span><strong>{{ resumen.imp.filas_rechazadas }}</strong></div>
+      </div>
+      {% if resumen.motivos %}
+      <div class="kpi-meta">Rechazadas por: {% for m, n in resumen.motivos.items() %}{{ n }} {{ m }}{% if not loop.last %} · {% endif %}{% endfor %}</div>
+      {% endif %}
+    {% else %}
+      <div class="empty-state">Aún no hay importación reciente.</div>
+    {% endif %}
+  </div>
 </div>
 
 {% if resumen %}
 <div class="mensaje ok">
-  Importación terminada: <strong>{{ resumen.imp.filas_cargadas }}</strong> filas cargadas y
-  <strong>{{ resumen.imp.filas_rechazadas }}</strong> rechazadas.
-  {% if resumen.motivos %}<br>Rechazadas por: {% for m, n in resumen.motivos.items() %}{{ n }} {{ m }}{% if not loop.last %} · {% endif %}{% endfor %}{% endif %}
+  Importación terminada: <strong>{{ resumen.imp.filas_cargadas }}</strong> filas cargadas y <strong>{{ resumen.imp.filas_rechazadas }}</strong> rechazadas.
 </div>
 {% endif %}
 
-<div class="caja">
-  <h2>Importaciones anteriores</h2>
-  <table>
-    <tr><th>Fecha</th><th>Archivo</th><th class="num">Cargadas</th><th class="num">Rechazadas</th></tr>
-    {% for i in historial %}
-    <tr><td>{{ i.fecha.strftime('%d/%m/%Y %H:%M') }}</td><td>{{ i.archivo }}</td><td class="num">{{ i.filas_cargadas }}</td><td class="num">{{ i.filas_rechazadas }}</td></tr>
-    {% else %}
-    <tr><td colspan="4" class="vacio">Aún no se ha importado ningún archivo.</td></tr>
-    {% endfor %}
-  </table>
+<div class="panel-card">
+  <div class="panel-head">
+    <h2>Importaciones anteriores</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Archivo</th>
+          <th class="cell-right">Cargadas</th>
+          <th class="cell-right">Rechazadas</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in historial %}
+        <tr>
+          <td>{{ i.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+          <td>{{ i.archivo }}</td>
+          <td class="cell-right">{{ i.filas_cargadas }}</td>
+          <td class="cell-right">{{ i.filas_rechazadas }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="empty-state">Aún no se ha importado ningún archivo.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 {% endblock %}
