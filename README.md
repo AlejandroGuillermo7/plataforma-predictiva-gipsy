@@ -1,6 +1,6 @@
 # Plataforma de Análisis Predictivo – Gipsy
 
-Sistema web para apoyar las decisiones de compra e inventario de la tienda de ropa **Gipsy** (Oaxaca), con base en el historial de ventas.
+Sistema web para apoyar las decisiones de compra e inventario de la tienda de ropa para dama **Gipsy** (Oaxaca), con base en el historial de ventas.
 
 Proyecto integrador de **Gestión de Proyectos de Software** – Instituto Tecnológico de Oaxaca, Equipo 4.
 Metodología de gestión: PRINCE2 · Modelo de desarrollo: Scrum.
